@@ -1,1 +1,5 @@
-abstract class JobRepository {}
+import 'package:chambaya/features/home/domain/job.dart';
+
+abstract class JobRepository {
+  Future<List<Job>> getPublishedJobs();
+}
