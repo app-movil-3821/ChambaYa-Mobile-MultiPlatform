@@ -7,10 +7,7 @@ import 'package:flutter/material.dart';
 class ApplyPage extends StatefulWidget {
   final Job job;
 
-  const ApplyPage({
-    super.key,
-    required this.job,
-  });
+  const ApplyPage({super.key, required this.job});
 
   @override
   State<ApplyPage> createState() => _ApplyPageState();
@@ -21,6 +18,29 @@ class _ApplyPageState extends State<ApplyPage> {
   String? _errorMessage;
 
   Future<void> _confirmApplication() async {
+    if (widget.job.id.isEmpty) {
+      setState(() {
+        _errorMessage = 'Este trabajo no tiene un ID válido.';
+      });
+      return;
+    }
+
+    if (widget.job.contractorId.isEmpty) {
+      setState(() {
+        _errorMessage =
+            'Este trabajo no tiene contratante asignado. Usa una publicación válida.';
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Este trabajo no tiene contratante asignado.'),
+          backgroundColor: Color(0xFFD93025),
+        ),
+      );
+
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -34,16 +54,12 @@ class _ApplyPageState extends State<ApplyPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Postulación enviada correctamente.'),
-        ),
+        const SnackBar(content: Text('Postulación enviada correctamente.')),
       );
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => ActiveShiftPage(job: widget.job),
-        ),
+        MaterialPageRoute(builder: (_) => ActiveShiftPage(job: widget.job)),
       );
     } catch (e) {
       if (!mounted) return;
@@ -124,9 +140,7 @@ class _ApplyPageState extends State<ApplyPage> {
               size: 72,
               color: Color(0xFF2146E8),
             ),
-
             const SizedBox(height: 16),
-
             const Text(
               '¿Deseas postular a este trabajo?',
               textAlign: TextAlign.center,
@@ -136,20 +150,13 @@ class _ApplyPageState extends State<ApplyPage> {
                 color: Color(0xFF202124),
               ),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'Revisa los datos antes de confirmar tu postulación.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                color: Color(0xFF5F6368),
-              ),
+              style: TextStyle(fontSize: 15, color: Color(0xFF5F6368)),
             ),
-
             const SizedBox(height: 24),
-
             Card(
               elevation: 0,
               color: Colors.white,
@@ -170,9 +177,7 @@ class _ApplyPageState extends State<ApplyPage> {
                         color: Color(0xFF202124),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Text(
                       widget.job.description,
                       maxLines: 3,
@@ -183,34 +188,26 @@ class _ApplyPageState extends State<ApplyPage> {
                         color: Color(0xFF5F6368),
                       ),
                     ),
-
                     const SizedBox(height: 18),
-
                     _ApplyInfoRow(
                       icon: Icons.location_on_outlined,
                       title: 'Ubicación',
                       value: _formatLocation(widget.job),
                     ),
-
                     const SizedBox(height: 14),
-
                     _ApplyInfoRow(
                       icon: Icons.schedule_outlined,
                       title: 'Horario',
                       value: _formatSchedule(widget.job),
                     ),
-
                     const SizedBox(height: 14),
-
                     _ApplyInfoRow(
                       icon: Icons.payments_outlined,
                       title: 'Pago',
                       value:
                           'S/ ${widget.job.paymentAmount.toStringAsFixed(2)}',
                     ),
-
                     const SizedBox(height: 14),
-
                     _ApplyInfoRow(
                       icon: Icons.category_outlined,
                       title: 'Categoría',
@@ -222,7 +219,6 @@ class _ApplyPageState extends State<ApplyPage> {
                 ),
               ),
             ),
-
             if (_errorMessage != null) ...[
               const SizedBox(height: 16),
               Text(
@@ -234,9 +230,7 @@ class _ApplyPageState extends State<ApplyPage> {
                 ),
               ),
             ],
-
             const SizedBox(height: 20),
-
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
@@ -314,12 +308,7 @@ class _ApplyInfoRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(width: 0),
-        Icon(
-          icon,
-          size: 22,
-          color: const Color(0xFF5F6368),
-        ),
+        Icon(icon, size: 22, color: const Color(0xFF5F6368)),
         const SizedBox(width: 10),
         Expanded(
           child: Column(

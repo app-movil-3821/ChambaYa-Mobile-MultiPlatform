@@ -50,6 +50,14 @@ class JobService {
       throw Exception('No se encontró el usuario logueado.');
     }
 
+    if (job.id.isEmpty) {
+      throw Exception('No se encontró el ID del trabajo.');
+    }
+
+    if (job.contractorId.isEmpty) {
+      throw Exception('No se encontró el ID del contratante.');
+    }
+
     final response = await http.post(
       Uri.parse('$_baseUrl/enrollments'),
       headers: {
@@ -67,8 +75,10 @@ class JobService {
       return;
     }
 
-    throw Exception(
-      'Error al postular: ${response.statusCode} - ${response.body}',
-    );
+    final body = response.body;
+    if (body.contains('Worker has already applied')) {
+      throw Exception('Ya postulaste a este trabajo.');
+    }
+    throw Exception('No se pudo registrar la postulación. Intenta nuevamente.');
   }
 }
