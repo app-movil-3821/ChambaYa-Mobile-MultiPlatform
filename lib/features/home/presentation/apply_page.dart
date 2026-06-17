@@ -1,4 +1,5 @@
 import 'package:chambaya/features/home/domain/job.dart';
+import 'package:chambaya/features/home/presentation/active_shift_page.dart';
 import 'package:flutter/material.dart';
 
 class ApplyPage extends StatelessWidget {
@@ -34,8 +35,12 @@ class ApplyPage extends StatelessWidget {
                     content: Text('Postulación enviada correctamente.'),
                   ),
                 );
-
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ActiveShiftPage(job: job),
+                  )
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2146E8),
