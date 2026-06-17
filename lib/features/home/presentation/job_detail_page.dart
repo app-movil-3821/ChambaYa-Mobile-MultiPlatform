@@ -1,4 +1,5 @@
 import 'package:chambaya/features/home/domain/job.dart';
+import 'package:chambaya/features/home/presentation/apply_page.dart';
 import 'package:flutter/material.dart';
 
 class JobDetailPage extends StatelessWidget {
@@ -29,9 +30,10 @@ class JobDetailPage extends StatelessWidget {
             height: 52,
             child: ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Luego conectaremos la postulación.'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ApplyPage(job: job),
                   ),
                 );
               },
