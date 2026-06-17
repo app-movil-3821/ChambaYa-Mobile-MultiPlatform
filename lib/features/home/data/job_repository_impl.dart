@@ -4,10 +4,16 @@ import 'package:chambaya/features/home/domain/job_repository.dart';
 
 class JobRepositoryImpl implements JobRepository {
   final JobService service;
+
   const JobRepositoryImpl({required this.service});
 
   @override
   Future<List<Job>> getPublishedJobs() {
     return service.getPublishedJobs();
+  }
+
+  @override
+  Future<void> applyToJob(Job job) {
+    return service.applyToJob(job);
   }
 }

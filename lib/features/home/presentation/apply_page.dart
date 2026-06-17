@@ -1,14 +1,71 @@
+import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/features/home/domain/job.dart';
+import 'package:chambaya/features/home/domain/job_repository.dart';
 import 'package:chambaya/features/home/presentation/active_shift_page.dart';
 import 'package:flutter/material.dart';
 
-class ApplyPage extends StatelessWidget {
+class ApplyPage extends StatefulWidget {
   final Job job;
 
   const ApplyPage({
     super.key,
     required this.job,
   });
+
+  @override
+  State<ApplyPage> createState() => _ApplyPageState();
+}
+
+class _ApplyPageState extends State<ApplyPage> {
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future<void> _confirmApplication() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final repository = getIt<JobRepository>();
+
+      await repository.applyToJob(widget.job);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Postulación enviada correctamente.'),
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ActiveShiftPage(job: widget.job),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _errorMessage = e.toString();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: const Color(0xFFD93025),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,33 +86,31 @@ class ApplyPage extends StatelessWidget {
           child: SizedBox(
             height: 52,
             child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Postulación enviada correctamente.'),
-                  ),
-                );
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ActiveShiftPage(job: job),
-                  )
-                );
-              },
+              onPressed: _isLoading ? null : _confirmApplication,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2146E8),
                 foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFF9CAAF5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'Confirmar postulación',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Confirmar postulación',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
         ),
@@ -108,7 +163,7 @@ class ApplyPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      job.title,
+                      widget.job.title,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -119,7 +174,7 @@ class ApplyPage extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     Text(
-                      job.description,
+                      widget.job.description,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -134,7 +189,7 @@ class ApplyPage extends StatelessWidget {
                     _ApplyInfoRow(
                       icon: Icons.location_on_outlined,
                       title: 'Ubicación',
-                      value: _formatLocation(job),
+                      value: _formatLocation(widget.job),
                     ),
 
                     const SizedBox(height: 14),
@@ -142,7 +197,7 @@ class ApplyPage extends StatelessWidget {
                     _ApplyInfoRow(
                       icon: Icons.schedule_outlined,
                       title: 'Horario',
-                      value: _formatSchedule(job),
+                      value: _formatSchedule(widget.job),
                     ),
 
                     const SizedBox(height: 14),
@@ -150,7 +205,8 @@ class ApplyPage extends StatelessWidget {
                     _ApplyInfoRow(
                       icon: Icons.payments_outlined,
                       title: 'Pago',
-                      value: 'S/ ${job.paymentAmount.toStringAsFixed(2)}',
+                      value:
+                          'S/ ${widget.job.paymentAmount.toStringAsFixed(2)}',
                     ),
 
                     const SizedBox(height: 14),
@@ -158,14 +214,26 @@ class ApplyPage extends StatelessWidget {
                     _ApplyInfoRow(
                       icon: Icons.category_outlined,
                       title: 'Categoría',
-                      value: job.category.isNotEmpty
-                          ? job.category
+                      value: widget.job.category.isNotEmpty
+                          ? widget.job.category
                           : 'Sin categoría',
                     ),
                   ],
                 ),
               ),
             ),
+
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFD93025),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
 
             const SizedBox(height: 20),
 
@@ -178,7 +246,7 @@ class ApplyPage extends StatelessWidget {
                 border: Border.all(color: const Color(0xFFC9D6FF)),
               ),
               child: const Text(
-                'Al confirmar, el contratante podrá revisar tu postulación. Más adelante conectaremos esta acción con el backend.',
+                'Al confirmar, tu postulación será enviada al contratante y registrada en el sistema.',
                 style: TextStyle(
                   fontSize: 13,
                   color: Color(0xFF1A3FD8),
@@ -246,28 +314,29 @@ class _ApplyInfoRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(width: 0),
         Icon(
           icon,
           size: 22,
-          color: Color(0xFF5F6368),
+          color: const Color(0xFF5F6368),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   color: Color(0xFF5F6368),
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: 3),
+              const SizedBox(height: 3),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
                   color: Color(0xFF202124),
                   fontWeight: FontWeight.w600,
