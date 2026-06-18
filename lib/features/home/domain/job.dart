@@ -64,8 +64,12 @@ class Job {
               ? location['district']?.toString()
               : null)
           ?? '',
-      scheduledStart: json['scheduledStart']?.toString() ?? '',
-      scheduledEnd: json['scheduledEnd']?.toString() ?? '',
+      scheduledStart: json['scheduledStart']?.toString()
+          ?? json['scheduleStart']?.toString()
+          ?? '',
+      scheduledEnd: json['scheduledEnd']?.toString()
+          ?? json['scheduleEnd']?.toString()
+          ?? '',
       status: json['status']?.toString() ?? '',
     );
   }
