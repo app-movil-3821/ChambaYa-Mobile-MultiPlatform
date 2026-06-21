@@ -4,9 +4,6 @@ abstract class ProfileRepository {
   Future<Profile> getProfile({required String userId});
   Future<Profile> updateProfile({
     required String userId,
-    required String name,
-    required String phone,
-    required String district,
-    required String experience,
+    required Map<String, dynamic> body,
   });
 }

@@ -16,20 +16,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<Profile> updateProfile({
     required String userId,
-    required String name,
-    required String phone,
-    required String district,
-    required String experience,
+    required Map<String, dynamic> body,
   }) async {
     final dto = await service.updateProfile(
-      userId: userId,
-      body: {
-        'name':       name,
-        'phone':      phone,
-        'district':   district,
-        'experience': experience,
-      },
-    );
+    userId: userId,
+    body:   body,
+  );
     return dto.toDomain();
-  }
+}
 }

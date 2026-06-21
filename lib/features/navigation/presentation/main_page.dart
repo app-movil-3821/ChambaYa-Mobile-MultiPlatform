@@ -2,6 +2,7 @@ import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/features/home/presentation/home_page.dart';
 import 'package:chambaya/features/home/presentation/home_view_model.dart';
 import 'package:chambaya/features/profile/presentation/profile_page.dart';
+import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,12 +23,12 @@ class _MainPageState extends State<MainPage> {
     ),
     const Center(child: Text('Shifts')),
     const Center(child: Text('Messages')),
-    const ProfilePage(),
+    BlocProvider(
+      create: (_) => getIt<ProfileViewModel>()
+        ..loadProfile(userId: '6a29fe85cf90f783625b23d9'),
+      child: const ProfilePage(),
+    ),
   ];
-
-  
-
-  
 
   @override
   Widget build(BuildContext context) {

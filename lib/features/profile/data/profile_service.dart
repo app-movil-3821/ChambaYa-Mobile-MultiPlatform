@@ -16,21 +16,27 @@ class ProfileService {
   Future<Map<String, String>> _headers() async {
     final token = await tokenStorage.getToken();
     return {
-      'Content-Type':  'application/json',
-      if (token != null) 'Authorization': 'Bearer \$token',
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
     };
   }
 
   Future<ProfileDto> getProfile({required String userId}) async {
+    final url = '$_baseUrl/users/$userId';
+    print('GET $url');
+
     final response = await http.get(
-      Uri.parse('\$_baseUrl/users/\$userId'),
+      Uri.parse(url),
       headers: await _headers(),
     );
+
+    print('Status: ${response.statusCode}');
+    print('Body: ${response.body}');
 
     if (response.statusCode == HttpStatus.ok) {
       return ProfileDto.fromJson(jsonDecode(response.body));
     }
-    throw Exception('Error al obtener perfil: \${response.statusCode}');
+    throw Exception('Error: ${response.statusCode} - ${response.body}');
   }
 
   Future<ProfileDto> updateProfile({
@@ -38,14 +44,17 @@ class ProfileService {
     required Map<String, dynamic> body,
   }) async {
     final response = await http.put(
-      Uri.parse('\$_baseUrl/users/\$userId'),
+      Uri.parse('$_baseUrl/users/$userId/profile'),
       headers: await _headers(),
       body:    jsonEncode(body),
     );
 
+    print('Update status: ${response.statusCode}');
+    print('Update body: ${response.body}');
+
     if (response.statusCode == HttpStatus.ok) {
       return ProfileDto.fromJson(jsonDecode(response.body));
     }
-    throw Exception('Error al actualizar perfil: \${response.statusCode}');
+    throw Exception('Error al actualizar perfil: ${response.statusCode}');
   }
 }
