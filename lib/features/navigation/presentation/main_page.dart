@@ -1,6 +1,7 @@
 import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/features/home/presentation/home_page.dart';
 import 'package:chambaya/features/home/presentation/home_view_model.dart';
+import 'package:chambaya/features/profile/presentation/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,8 +22,12 @@ class _MainPageState extends State<MainPage> {
     ),
     const Center(child: Text('Shifts')),
     const Center(child: Text('Messages')),
-    const Center(child: Text('Profile')),
+    const ProfilePage(),
   ];
+
+  
+
+  
 
   @override
   Widget build(BuildContext context) {
