@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 class ProfileService {
   static const String _baseUrl =
-      'https://backend-chambaya-production-b2e5.up.railway.app/api/v1';
+      'https://backend-chambaya-production-a24a.up.railway.app/api/v1';
 
   final TokenStorage tokenStorage;
 
