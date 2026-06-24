@@ -23,6 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await service.login(dto);
     await tokenStorage.saveToken(response.token);
     await tokenStorage.saveUserId(response.userId);
+    await tokenStorage.saveRole(response.role);
     return response.toDomain();
   }
 
