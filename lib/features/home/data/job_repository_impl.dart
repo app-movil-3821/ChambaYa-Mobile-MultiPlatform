@@ -16,4 +16,9 @@ class JobRepositoryImpl implements JobRepository {
   Future<void> applyToJob(Job job) {
     return service.applyToJob(job);
   }
+
+  @override
+  Future<Job?> getJobById(String jobId) {
+    return service.getJobById(jobId);
+  }
 }

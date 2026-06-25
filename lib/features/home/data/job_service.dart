@@ -38,6 +38,21 @@ class JobService {
     throw Exception('Error al cargar trabajos: ${response.statusCode}');
   }
 
+  Future<Job?> getJobById(String jobId) async {
+    final token = await tokenStorage.getToken();
+    final response = await http.get(
+      Uri.parse('$_baseUrl/jobs/$jobId'),
+      headers: {
+        'Authorization': 'Bearer ${token ?? ''}',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      return Job.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    }
+    return null;
+  }
+
   Future<void> applyToJob(Job job) async {
     final token = await tokenStorage.getToken();
     final userId = await tokenStorage.getUserId();
