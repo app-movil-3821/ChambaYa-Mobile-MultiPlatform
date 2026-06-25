@@ -75,9 +75,9 @@ class MessagesPage extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => BlocProvider(
                                 create: (_) => ChatViewModel(
-                                  repository:     context.read<MessagesViewModel>().repository,
-                                  conversationId: conv.id,
-                                  senderId:       context.read<MessagesViewModel>().currentUserId,
+                                repository:     context.read<MessagesViewModel>().repository,
+                                conversationId: conv.id,
+                                senderId:       conv.workerId,
                                 )..loadMessages(),
                                 child: ChatPage(conversationId: conv.id),
                               ),
