@@ -3,8 +3,10 @@ import 'package:chambaya/features/home/presentation/home_page.dart';
 import 'package:chambaya/features/home/presentation/home_view_model.dart';
 import 'package:chambaya/features/profile/presentation/profile_page.dart';
 import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
+import 'package:chambaya/core/storage/token_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -12,28 +14,41 @@ class MainPage extends StatefulWidget {
   @override
   State<MainPage> createState() => _MainPageState();
 }
-
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  String? _userId;
 
-  late final List<Widget> _pages = [
-    BlocProvider(
-      create: (_) => getIt<HomeViewModel>(),
-      child: const HomePage(),
-    ),
-    const Center(child: Text('Shifts')),
-    const Center(child: Text('Messages')),
-    BlocProvider(
-      create: (_) => getIt<ProfileViewModel>()
-        ..loadProfile(userId: '6a29fe85cf90f783625b23d9'),
-      child: const ProfilePage(),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Cargar userId al iniciar
+    getIt<TokenStorage>().getUserId().then((id) {
+      setState(() => _userId = id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          BlocProvider(
+            create: (_) => getIt<HomeViewModel>(),
+            child: const HomePage(),
+          ),
+          const Center(child: Text('Shifts')),
+          const Center(child: Text('Messages')),
+          if (_userId != null)
+            BlocProvider(
+              create: (_) => getIt<ProfileViewModel>()
+                ..loadProfile(userId: _userId!),
+              child: const ProfilePage(),
+            )
+          else
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (i) => setState(() => _selectedIndex = i),

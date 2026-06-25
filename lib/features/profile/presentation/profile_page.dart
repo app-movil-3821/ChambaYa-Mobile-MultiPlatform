@@ -1,6 +1,11 @@
 import 'package:chambaya/features/profile/presentation/profile_state.dart';
 import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
 import 'package:chambaya/features/profile/presentation/settings_page.dart';
+import 'package:chambaya/core/di/dependency_injection.dart';
+import 'package:chambaya/core/storage/token_storage.dart';
+import 'package:chambaya/features/auth/presentation/login_page.dart';
+import 'package:chambaya/features/auth/presentation/login_view_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -200,7 +205,21 @@ class ProfilePage extends StatelessWidget {
                           label:      'Cerrar sesión',
                           labelColor: const Color(0xFFD93025),
                           iconColor:  const Color(0xFFD93025),
-                          onTap:      () {},
+                          onTap: () async {
+                            await getIt<TokenStorage>().deleteAll();
+                            if (context.mounted) {
+                              Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => BlocProvider(
+                                  create: (_) => getIt<LoginViewModel>(),
+                                  child: LoginPage(),
+                                ),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        },
                         ),
                       ),
                     ],
