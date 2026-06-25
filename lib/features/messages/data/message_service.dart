@@ -22,16 +22,20 @@ class MessageService {
   }
 
   Future<List<ConversationDto>> getConversations({required String userId}) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/communications/user/\$userId'),
-      headers: await _headers(),
-    );
-    if (response.statusCode == HttpStatus.ok) {
-      final List<dynamic> json = jsonDecode(response.body);
-      return json.map((e) => ConversationDto.fromJson(e)).toList();
-    }
-    throw Exception('Error al cargar conversaciones: \${response.statusCode}');
+  final url = '$_baseUrl/communications/user/$userId';
+  print('GET $url'); 
+  final response = await http.get(
+    Uri.parse(url),
+    headers: await _headers(),
+  );
+  print('Status: ${response.statusCode}');
+  print('Body: ${response.body}'); 
+  if (response.statusCode == HttpStatus.ok) {
+    final List<dynamic> json = jsonDecode(response.body);
+    return json.map((e) => ConversationDto.fromJson(e)).toList();
   }
+  throw Exception('Error al cargar conversaciones: ${response.statusCode}');
+  } 
 
   Future<List<MessageDto>> getMessages({required String conversationId}) async {
     final response = await http.get(
