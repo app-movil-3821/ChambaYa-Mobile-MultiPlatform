@@ -11,7 +11,12 @@ import 'package:chambaya/features/profile/data/profile_repository_impl.dart';
 import 'package:chambaya/features/profile/data/profile_service.dart';
 import 'package:chambaya/features/profile/domain/profile_repository.dart';
 import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
+import 'package:chambaya/features/messages/data/message_repository_impl.dart';
+import 'package:chambaya/features/messages/data/message_service.dart';
+import 'package:chambaya/features/messages/domain/message_repository.dart';
+import 'package:chambaya/features/messages/presentation/messages_view_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -58,4 +63,16 @@ void setup() {
   getIt.registerFactory(
     () => ProfileViewModel(repository: getIt<ProfileRepository>()),
   );
+
+  //Messages
+  getIt.registerLazySingleton<MessageService>(
+    () => MessageService(tokenStorage: getIt<TokenStorage>()),
+  );
+  getIt.registerLazySingleton<MessageRepository>(
+    () => MessageRepositoryImpl(service: getIt<MessageService>()),
+  );
+  getIt.registerFactory(
+    () => MessagesViewModel(repository: getIt<MessageRepository>()),
+  );
+
 }

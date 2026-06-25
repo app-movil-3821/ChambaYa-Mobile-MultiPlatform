@@ -4,4 +4,6 @@ abstract class JobRepository {
   Future<List<Job>> getPublishedJobs();
 
   Future<void> applyToJob(Job job);
+
+  Future<Job?> getJobById(String jobId);
 }
