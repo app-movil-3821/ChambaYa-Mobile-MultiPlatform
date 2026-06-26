@@ -4,12 +4,14 @@ import 'package:chambaya/features/shifts/domain/job.dart';
 import 'package:chambaya/features/shifts/domain/shift_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-// ── States ───────────────────────────────────────────────────────
 abstract class ShiftsState {}
 
-class ShiftsInitial extends ShiftsState {}
-class ShiftsLoading extends ShiftsState {}
-class ShiftsError   extends ShiftsState { final String message; ShiftsError(this.message); }
+class ShiftsInitial   extends ShiftsState {}
+class ShiftsLoading   extends ShiftsState {}
+class ShiftsError     extends ShiftsState {
+  final String message;
+  ShiftsError(this.message);
+}
 
 class WorkerShiftsLoaded extends ShiftsState {
   final List<Enrollment> enrollments;
@@ -18,19 +20,35 @@ class WorkerShiftsLoaded extends ShiftsState {
 
 class ContractorShiftsLoaded extends ShiftsState {
   final List<Job> jobs;
-  ContractorShiftsLoaded(this.jobs);
+  final Map<String, List<Enrollment>> enrollmentsByJob;
+  final Set<String> expandedJobs;
+  final Set<String> loadingEnrollments;
+
+  ContractorShiftsLoaded(
+    this.jobs, {
+    this.enrollmentsByJob    = const {},
+    this.expandedJobs        = const {},
+    this.loadingEnrollments  = const {},
+  });
+
+  ContractorShiftsLoaded copyWith({
+    List<Job>?                      jobs,
+    Map<String, List<Enrollment>>?  enrollmentsByJob,
+    Set<String>?                    expandedJobs,
+    Set<String>?                    loadingEnrollments,
+  }) {
+    return ContractorShiftsLoaded(
+      jobs               ?? this.jobs,
+      enrollmentsByJob:    enrollmentsByJob   ?? this.enrollmentsByJob,
+      expandedJobs:        expandedJobs       ?? this.expandedJobs,
+      loadingEnrollments:  loadingEnrollments ?? this.loadingEnrollments,
+    );
+  }
 }
 
-class JobEnrollmentsLoaded extends ShiftsState {
-  final List<Enrollment> enrollments;
-  final String jobId;
-  JobEnrollmentsLoaded(this.enrollments, this.jobId);
-}
-
-// ── Cubit ─────────────────────────────────────────────────────────
 class ShiftsViewModel extends Cubit<ShiftsState> {
   final ShiftRepository repository;
-  final TokenStorage tokenStorage;
+  final TokenStorage    tokenStorage;
 
   ShiftsViewModel({
     required this.repository,
@@ -53,11 +71,64 @@ class ShiftsViewModel extends Cubit<ShiftsState> {
     }
   }
 
-  Future<void> loadEnrollmentsForJob(String jobId) async {
-    emit(ShiftsLoading());
+  Future<void> toggleEnrollments(String jobId) async {
+    final s = state;
+    if (s is! ContractorShiftsLoaded) return;
+
+    final expanded = Set<String>.from(s.expandedJobs);
+
+    // Si ya está expandido, colapsar
+    if (expanded.contains(jobId)) {
+      expanded.remove(jobId);
+      emit(s.copyWith(expandedJobs: expanded));
+      return;
+    }
+
+    // Expandir y cargar si no están cargados
+    expanded.add(jobId);
+    final loading = Set<String>.from(s.loadingEnrollments)..add(jobId);
+    emit(s.copyWith(expandedJobs: expanded, loadingEnrollments: loading));
+
     try {
       final enrollments = await repository.getEnrollmentsByJob(jobId);
-      emit(JobEnrollmentsLoaded(enrollments, jobId));
+      final current = state;
+      if (current is ContractorShiftsLoaded) {
+        final newMap = Map<String, List<Enrollment>>.from(current.enrollmentsByJob);
+        newMap[jobId] = enrollments;
+        final newLoading = Set<String>.from(current.loadingEnrollments)..remove(jobId);
+        emit(current.copyWith(enrollmentsByJob: newMap, loadingEnrollments: newLoading));
+      }
+    } catch (e) {
+      emit(ShiftsError(e.toString()));
+    }
+  }
+
+  Future<void> acceptEnrollment(String enrollmentId, String jobId) async {
+    try {
+      await repository.acceptEnrollment(enrollmentId);
+      // Recargar postulantes del job
+      final enrollments = await repository.getEnrollmentsByJob(jobId);
+      final s = state;
+      if (s is ContractorShiftsLoaded) {
+        final newMap = Map<String, List<Enrollment>>.from(s.enrollmentsByJob);
+        newMap[jobId] = enrollments;
+        emit(s.copyWith(enrollmentsByJob: newMap));
+      }
+    } catch (e) {
+      emit(ShiftsError(e.toString()));
+    }
+  }
+
+  Future<void> rejectEnrollment(String enrollmentId, String jobId) async {
+    try {
+      await repository.rejectEnrollment(enrollmentId);
+      final enrollments = await repository.getEnrollmentsByJob(jobId);
+      final s = state;
+      if (s is ContractorShiftsLoaded) {
+        final newMap = Map<String, List<Enrollment>>.from(s.enrollmentsByJob);
+        newMap[jobId] = enrollments;
+        emit(s.copyWith(enrollmentsByJob: newMap));
+      }
     } catch (e) {
       emit(ShiftsError(e.toString()));
     }
@@ -98,6 +169,11 @@ class ShiftsViewModel extends Cubit<ShiftsState> {
       emit(ShiftsError(e.toString()));
     }
   }
+  
+  Future<void> createJob(Map<String, dynamic> data) async {
+  await repository.createJob(data);
+  await loadShifts();
+}
 
   Future<void> cancelJob(String jobId) async {
     try {
@@ -108,19 +184,19 @@ class ShiftsViewModel extends Cubit<ShiftsState> {
     }
   }
 
-  Future<void> acceptEnrollment(String enrollmentId, String jobId) async {
+  Future<void> reopenJob(String jobId) async {
     try {
-      await repository.acceptEnrollment(enrollmentId);
-      await loadEnrollmentsForJob(jobId);
+      await repository.publishJob(jobId);
+      await loadShifts();
     } catch (e) {
       emit(ShiftsError(e.toString()));
     }
   }
 
-  Future<void> rejectEnrollment(String enrollmentId, String jobId) async {
+  Future<void> closeJob(String jobId) async {
     try {
-      await repository.rejectEnrollment(enrollmentId);
-      await loadEnrollmentsForJob(jobId);
+      await repository.closeJob(jobId);
+      await loadShifts();
     } catch (e) {
       emit(ShiftsError(e.toString()));
     }

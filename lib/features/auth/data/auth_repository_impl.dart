@@ -21,6 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     final dto = LoginRequestDto(email: email, password: password);
     final response = await service.login(dto);
+    print('TOKEN: ${response.token}');  // ← AGREGA ESTO
     await tokenStorage.saveToken(response.token);
     await tokenStorage.saveUserId(response.userId);
     await tokenStorage.saveRole(response.role);

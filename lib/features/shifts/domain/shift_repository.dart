@@ -12,6 +12,7 @@ abstract class ShiftRepository {
   Future<void> publishJob(String jobId);
   Future<void> startJob(String jobId);
   Future<void> completeJob(String jobId);
+  Future<void> closeJob(String jobId);
   Future<void> cancelJob(String jobId);
   Future<List<Enrollment>> getEnrollmentsByJob(String jobId);
   Future<void> acceptEnrollment(String enrollmentId);

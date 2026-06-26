@@ -5,6 +5,7 @@ class Enrollment {
   final String jobId;
   final String workerId;
   final String status;
+  final String  workerName;
   final String appliedAt;
   final Job? job; // populated cuando se necesite
 
@@ -12,6 +13,7 @@ class Enrollment {
     required this.id,
     required this.jobId,
     required this.workerId,
+    required this.workerName,
     required this.status,
     required this.appliedAt,
     this.job,

@@ -74,12 +74,33 @@ class ShiftRepositoryImpl implements ShiftRepository {
   Future<void> cancelJob(String jobId) async =>
       service.cancelJob(jobId, await _token());
 
+@override
+Future<List<Enrollment>> getEnrollmentsByJob(String jobId) async {
+  final token = await _token();
+  final dtos  = await service.getEnrollmentsByJob(jobId, token);
+
+  // Obtener nombre de cada worker
+  final enrollments = await Future.wait(
+    dtos.map((dto) async {
+      final name = await service.getUserName(dto.workerId, token);
+      return Enrollment(
+        id:         dto.id,
+        jobId:      dto.jobId,
+        workerId:   dto.workerId,
+        workerName: name,
+        status:     dto.status,
+        appliedAt:  dto.appliedAt,
+        job:        dto.job?.toDomain(),
+      );
+    }),
+  );
+
+  return enrollments;
+}
+
   @override
-  Future<List<Enrollment>> getEnrollmentsByJob(String jobId) async {
-    final token = await _token();
-    final dtos  = await service.getEnrollmentsByJob(jobId, token);
-    return dtos.map((e) => e.toDomain()).toList();
-  }
+  Future<void> closeJob(String jobId) async =>
+    service.closeJob(jobId, await _token());
 
   @override
   Future<void> acceptEnrollment(String enrollmentId) async =>

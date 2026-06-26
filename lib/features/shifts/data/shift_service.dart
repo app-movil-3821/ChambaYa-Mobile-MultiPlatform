@@ -32,11 +32,14 @@ class ShiftService {
   }
 
   Future<JobDto> createJob(Map<String, dynamic> body, String token) async {
+    print('Create job body: ${jsonEncode(body)}');
     final res = await http.post(
       Uri.parse('$_baseUrl/jobs'),
       headers: _headers(token),
       body: jsonEncode(body),
     );
+    print('Create job status: ${res.statusCode}');
+    print('Create job response: ${res.body}');
     if (res.statusCode == HttpStatus.ok || res.statusCode == HttpStatus.created) {
       return JobDto.fromJson(jsonDecode(res.body));
     }
@@ -62,6 +65,29 @@ class ShiftService {
       throw Exception('Error al iniciar: ${res.statusCode}');
     }
   }
+
+  Future<String> getUserName(String userId, String token) async {
+  final res = await http.get(
+    Uri.parse('$_baseUrl/users/$userId'),
+    headers: _headers(token),
+  );
+  if (res.statusCode == HttpStatus.ok) {
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
+    return json['name'] as String? ?? userId;
+  }
+  return userId; 
+}
+
+
+  Future<void> closeJob(String jobId, String token) async {
+  final res = await http.put(
+    Uri.parse('$_baseUrl/jobs/$jobId/close'),
+    headers: _headers(token),
+  );
+  if (res.statusCode != HttpStatus.ok) {
+    throw Exception('Error al cerrar: ${res.statusCode}');
+  }
+}
 
   Future<void> completeJob(String jobId, String token) async {
     final res = await http.put(
@@ -110,10 +136,14 @@ class ShiftService {
   // ── ENROLLMENTS (Contratante) ────────────────────────────────
 
   Future<List<EnrollmentDto>> getEnrollmentsByJob(String jobId, String token) async {
+
+    print('Enrollments URL: $_baseUrl/enrollments/job/$jobId');
     final res = await http.get(
       Uri.parse('$_baseUrl/enrollments/job/$jobId'),
       headers: _headers(token),
     );
+    print('Enrollments Status: ${res.statusCode}');
+    print('Enrollments Body: ${res.body}');
     if (res.statusCode == HttpStatus.ok) {
       final list = jsonDecode(res.body) as List<dynamic>;
       return list.map((e) => EnrollmentDto.fromJson(e as Map<String, dynamic>)).toList();
