@@ -1,4 +1,12 @@
+import 'package:chambaya/core/di/dependency_injection.dart';
+import 'package:chambaya/features/home/presentation/home_page.dart';
+import 'package:chambaya/features/home/presentation/home_view_model.dart';
+import 'package:chambaya/features/profile/presentation/profile_page.dart';
+import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
+import 'package:chambaya/features/shifts/presentation/shifts_page.dart';
+import 'package:chambaya/features/shifts/presentation/shifts_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -10,18 +18,35 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
+  late final List<Widget> _pages = [
+    BlocProvider(
+      create: (_) => getIt<HomeViewModel>(),
+      child: const HomePage(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<ShiftsViewModel>()..loadShifts(),
+      child: const ShiftsPage(),
+    ),
+    const Center(child: Text('Messages')),
+    BlocProvider(
+      create: (_) => getIt<ProfileViewModel>()
+        ..loadProfile(userId: '6a29fe85cf90f783625b23d9'),
+      child: const ProfilePage(),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text('Tab $_selectedIndex')),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (i) => setState(() => _selectedIndex = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.work_outline), label: 'Shifts'),
-          NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Messages'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(icon: Icon(Icons.home_outlined),         label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.work_outline),           label: 'Shifts'),
+          NavigationDestination(icon: Icon(Icons.chat_bubble_outline),    label: 'Messages'),
+          NavigationDestination(icon: Icon(Icons.person_outline),         label: 'Profile'),
         ],
       ),
     );
