@@ -19,6 +19,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:get_it/get_it.dart';
 
+import 'package:chambaya/features/shifts/data/shift_repository_impl.dart';
+import 'package:chambaya/features/shifts/data/shift_service.dart';
+import 'package:chambaya/features/shifts/domain/shift_repository.dart';
+import 'package:chambaya/features/shifts/presentation/shifts_view_model.dart';
+
 final getIt = GetIt.instance;
 
 void setup() {
@@ -64,7 +69,7 @@ void setup() {
     () => ProfileViewModel(repository: getIt<ProfileRepository>()),
   );
 
-  //Messages
+  // Messages
   getIt.registerLazySingleton<MessageService>(
     () => MessageService(tokenStorage: getIt<TokenStorage>()),
   );
@@ -73,6 +78,21 @@ void setup() {
   );
   getIt.registerFactory(
     () => MessagesViewModel(repository: getIt<MessageRepository>()),
+  );
+
+  // Shifts
+  getIt.registerLazySingleton<ShiftService>(() => ShiftService());
+  getIt.registerLazySingleton<ShiftRepository>(
+    () => ShiftRepositoryImpl(
+      service:      getIt<ShiftService>(),
+      tokenStorage: getIt<TokenStorage>(),
+    ),
+  );
+  getIt.registerFactory(
+    () => ShiftsViewModel(
+      repository:   getIt<ShiftRepository>(),
+      tokenStorage: getIt<TokenStorage>(),
+    ),
   );
 
 }

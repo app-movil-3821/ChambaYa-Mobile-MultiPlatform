@@ -5,6 +5,8 @@ import 'package:chambaya/features/profile/presentation/profile_page.dart';
 import 'package:chambaya/features/profile/presentation/profile_view_model.dart';
 import 'package:chambaya/features/messages/presentation/messages_page.dart';
 import 'package:chambaya/features/messages/presentation/messages_view_model.dart';
+import 'package:chambaya/features/shifts/presentation/shifts_page.dart';
+import 'package:chambaya/features/shifts/presentation/shifts_view_model.dart';
 import 'package:chambaya/core/storage/token_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +25,6 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    // Cargar userId al iniciar
     getIt<TokenStorage>().getUserId().then((id) {
       setState(() => _userId = id);
     });
@@ -39,18 +40,20 @@ class _MainPageState extends State<MainPage> {
             create: (_) => getIt<HomeViewModel>(),
             child: const HomePage(),
           ),
-          const Center(child: Text('Shifts')),
+          BlocProvider(
+            create: (_) => getIt<ShiftsViewModel>()..loadShifts(),
+            child: const ShiftsPage(),
+          ),
           BlocProvider(
             create: (_) {
-            final vm = getIt<MessagesViewModel>();
-            getIt<TokenStorage>().getUserId().then((id) {
-            if (id != null) vm.loadConversations(userId: id);
-            });
+              final vm = getIt<MessagesViewModel>();
+              getIt<TokenStorage>().getUserId().then((id) {
+                if (id != null) vm.loadConversations(userId: id);
+              });
               return vm;
             },
             child: const MessagesPage(),
-            ),
-
+          ),
           if (_userId != null)
             BlocProvider(
               create: (_) => getIt<ProfileViewModel>()
@@ -65,10 +68,10 @@ class _MainPageState extends State<MainPage> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (i) => setState(() => _selectedIndex = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.work_outline), label: 'Shifts'),
-          NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Messages'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(icon: Icon(Icons.home_outlined),         label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.work_outline),           label: 'Shifts'),
+          NavigationDestination(icon: Icon(Icons.chat_bubble_outline),    label: 'Messages'),
+          NavigationDestination(icon: Icon(Icons.person_outline),         label: 'Profile'),
         ],
       ),
     );

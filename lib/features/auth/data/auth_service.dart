@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   static const String _baseUrl =
-      'https://backend-chambaya-production-a24a.up.railway.app/api/v1';
+    'https://backend-chambaya-production-a24a.up.railway.app/api/v1';
 
   Future<LoginResponseDto> login(LoginRequestDto dto) async {
     final response = await http.post(

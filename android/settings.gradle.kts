@@ -24,3 +24,7 @@ plugins {
 }
 
 include(":app")
+
+gradle.buildFinished {
+    file("build/reports/problems").deleteRecursively()
+}
