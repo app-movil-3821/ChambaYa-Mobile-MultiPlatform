@@ -3,6 +3,7 @@ import 'package:chambaya/features/shifts/data/shift_service.dart';
 import 'package:chambaya/features/shifts/domain/enrollment.dart';
 import 'package:chambaya/features/shifts/domain/job.dart';
 import 'package:chambaya/features/shifts/domain/shift_repository.dart';
+import 'package:chambaya/features/shifts/data/job_dto.dart';
 
 class ShiftRepositoryImpl implements ShiftRepository {
   final ShiftService service;
@@ -27,13 +28,34 @@ class ShiftRepositoryImpl implements ShiftRepository {
 
   // ── Chambeador ───────────────────────────────────────────────
 
-  @override
-  Future<List<Enrollment>> getMyEnrollments() async {
-    final token    = await _token();
-    final workerId = await _userId();
-    final dtos     = await service.getEnrollmentsByWorker(workerId, token);
-    return dtos.map((e) => e.toDomain()).toList();
-  }
+@override
+Future<List<Enrollment>> getMyEnrollments() async {
+  final token    = await _token();
+  final workerId = await _userId();
+  final dtos     = await service.getEnrollmentsByWorker(workerId, token);
+
+  // Obtener info del job para cada enrollment
+  final enrollments = await Future.wait(
+    dtos.map((dto) async {
+      JobDto? jobDto;
+      try {
+        jobDto = await service.getJobById(dto.jobId, token);
+      } catch (_) {}
+
+      return Enrollment(
+        id:         dto.id,
+        jobId:      dto.jobId,
+        workerId:   dto.workerId,
+        workerName: dto.workerName,
+        status:     dto.status,
+        appliedAt:  dto.appliedAt,
+        job:        jobDto?.toDomain(),
+      );
+    }),
+  );
+
+  return enrollments;
+}
 
   @override
   Future<void> cancelEnrollment(String enrollmentId) async {

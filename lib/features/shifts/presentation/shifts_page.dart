@@ -69,8 +69,8 @@ Widget build(BuildContext context) {
                   }
                 },
                 backgroundColor: _blue,
-                icon: const Icon(Icons.work_outline),
-                label: const Text('Publicar Chamba', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.work_outline, color: Colors.white),
+                label: const Text('Publicar Chamba', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               )
             : null,
         body: _buildBody(context, state),
@@ -343,18 +343,23 @@ class _JobCard extends StatelessWidget {
             const SizedBox(height: 6),
 
             // Dirección
-            Row(children: [
-              const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '${job.address}, ${job.district}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ]),
-            const SizedBox(height: 8),
+Builder(
+  builder: (context) {
+    print('address: ${job.address} | district: ${job.district}');
+    return Row(children: [
+      const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
+      const SizedBox(width: 4),
+      Expanded(
+        child: Text(
+          '${job.address}, ${job.district}',
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ]);
+  },
+),
+const SizedBox(height: 8),
 
             // Precio
             Text(
