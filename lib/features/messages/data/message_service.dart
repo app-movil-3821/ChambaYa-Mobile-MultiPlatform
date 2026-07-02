@@ -17,7 +17,7 @@ class MessageService {
     final token = await tokenStorage.getToken();
     return {
       'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer \$token',
+      if (token != null) 'Authorization': 'Bearer $token',
     };
   }
 
@@ -39,14 +39,14 @@ class MessageService {
 
   Future<List<MessageDto>> getMessages({required String conversationId}) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/communications/\$conversationId/messages'),
+      Uri.parse('$_baseUrl/communications/$conversationId/messages'),
       headers: await _headers(),
     );
     if (response.statusCode == HttpStatus.ok) {
       final List<dynamic> json = jsonDecode(response.body);
       return json.map((e) => MessageDto.fromJson(e)).toList();
     }
-    throw Exception('Error al cargar mensajes: \${response.statusCode}');
+    throw Exception('Error al cargar mensajes: ${response.statusCode}');
   }
 
   Future<MessageDto> sendMessage({
@@ -55,7 +55,7 @@ class MessageService {
     required String content,
   }) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/communications/\$conversationId/messages'),
+      Uri.parse('$_baseUrl/communications/$conversationId/messages'),
       headers: await _headers(),
       body: jsonEncode({'senderId': senderId, 'content': content}),
     );
@@ -63,6 +63,6 @@ class MessageService {
         response.statusCode == HttpStatus.created) {
       return MessageDto.fromJson(jsonDecode(response.body));
     }
-    throw Exception('Error al enviar mensaje: \${response.statusCode}');
+    throw Exception('Error al enviar mensaje: ${response.statusCode}');
   }
 }
