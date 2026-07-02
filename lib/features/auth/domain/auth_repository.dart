@@ -7,5 +7,6 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String phone,
+    String role = 'CHAMBEADOR',
   });
 }

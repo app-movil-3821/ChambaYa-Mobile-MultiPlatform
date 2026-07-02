@@ -34,12 +34,14 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     required String phone,
+    String role = 'CHAMBEADOR',
   }) async {
     final dto = RegisterRequestDto(
       name:     name,
       email:    email,
       password: password,
       phone:    phone,
+      role:     role,
     );
     final json = await service.register(dto);
     return User(

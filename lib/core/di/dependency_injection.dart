@@ -3,6 +3,7 @@ import 'package:chambaya/features/auth/data/auth_repository_impl.dart';
 import 'package:chambaya/features/auth/data/auth_service.dart';
 import 'package:chambaya/features/auth/domain/auth_repository.dart';
 import 'package:chambaya/features/auth/presentation/login_view_model.dart';
+import 'package:chambaya/features/auth/presentation/register_view_model.dart';
 import 'package:chambaya/features/home/data/job_repository_impl.dart';
 import 'package:chambaya/features/home/data/job_service.dart';
 import 'package:chambaya/features/home/domain/job_repository.dart';
@@ -45,6 +46,12 @@ void setup() {
   );
   getIt.registerFactory(
     () => LoginViewModel(repository: getIt<AuthRepository>()),
+  );
+  getIt.registerFactory(
+    () => RegisterViewModel(
+      repository:        getIt<AuthRepository>(),
+      profileRepository: getIt<ProfileRepository>(),
+    ),
   );
 
   // Home

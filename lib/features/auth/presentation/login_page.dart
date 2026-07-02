@@ -1,5 +1,8 @@
+import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/features/auth/presentation/login_state.dart';
 import 'package:chambaya/features/auth/presentation/login_view_model.dart';
+import 'package:chambaya/features/auth/presentation/register_page.dart';
+import 'package:chambaya/features/auth/presentation/register_view_model.dart';
 import 'package:chambaya/features/navigation/presentation/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -134,7 +137,15 @@ class LoginPage extends StatelessWidget {
                     const Text('¿No tienes cuenta? '),
                     GestureDetector(
                       onTap: () {
-                        // navegar a register
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider(
+                              create: (_) => getIt<RegisterViewModel>(),
+                              child: const RegisterPage(),
+                            ),
+                          ),
+                        );
                       },
                       child: const Text(
                         'Regístrate',
