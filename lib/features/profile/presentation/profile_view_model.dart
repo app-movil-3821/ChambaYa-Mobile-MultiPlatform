@@ -47,5 +47,5 @@ class ProfileViewModel extends Cubit<ProfileState> {
     emit(ProfileFailure(error: 'Error al actualizar perfil'));
   }
 }
-  
+
 }
