@@ -161,6 +161,17 @@ class ShiftService {
     }
   }
 
+  Future<JobDto> getJobById(String jobId, String token) async {
+  final res = await http.get(
+    Uri.parse('$_baseUrl/jobs/$jobId'),
+    headers: _headers(token),
+  );
+  if (res.statusCode == HttpStatus.ok) {
+    return JobDto.fromJson(jsonDecode(res.body));
+  }
+  throw Exception('Error al obtener job: ${res.statusCode}');
+}
+
   Future<void> rejectEnrollment(String enrollmentId, String token) async {
     final res = await http.put(
       Uri.parse('$_baseUrl/enrollments/$enrollmentId/reject'),

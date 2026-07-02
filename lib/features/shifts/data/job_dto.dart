@@ -29,21 +29,24 @@ class JobDto {
     required this.status,
   });
 
-  factory JobDto.fromJson(Map<String, dynamic> json) => JobDto(
-    id:             json['id']             as String,
-    contractorId:   json['contractorId']   as String,
-    title:          json['title']          as String,
-    description:    json['description']    as String? ?? '',
-    category:       json['category']       as String? ?? '',
-    requiredSkills: (json['requiredSkills'] as List<dynamic>?)
-                        ?.map((e) => e as String).toList() ?? [],
-    paymentAmount:  (json['paymentAmount'] as num).toDouble(),
-    address:        json['address']        as String? ?? '',
-    district:       json['district']       as String? ?? '',
-    scheduledStart: json['scheduledStart'] as String? ?? '',
-    scheduledEnd:   json['scheduledEnd']   as String? ?? '',
-    status:         json['status']         as String? ?? '',
-  );
+  factory JobDto.fromJson(Map<String, dynamic> json) {
+    final location = json['location'] as Map<String, dynamic>?;
+    return JobDto(
+      id:             json['id']           as String,
+      contractorId:   json['contractorId'] as String,
+      title:          json['title']        as String,
+      description:    json['description']  as String? ?? '',
+      category:       json['category']     as String? ?? '',
+      requiredSkills: (json['requiredSkills'] as List<dynamic>?)
+                          ?.map((e) => e as String).toList() ?? [],
+      paymentAmount:  (json['paymentAmount'] as num).toDouble(),
+      address:        location?['address']  as String? ?? '',
+      district:       location?['district'] as String? ?? '',
+      scheduledStart: json['scheduleStart'] as String? ?? '',
+      scheduledEnd:   json['scheduleEnd']   as String? ?? '',
+      status:         json['status']        as String? ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'contractorId':   contractorId,
