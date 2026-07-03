@@ -1,3 +1,4 @@
+import 'package:chambaya/features/notifications/presentation/notification_bell_button.dart';
 import 'package:chambaya/features/shifts/domain/enrollment.dart';
 import 'package:chambaya/features/shifts/domain/job.dart';
 import 'package:chambaya/features/shifts/presentation/shifts_view_model.dart';
@@ -45,11 +46,8 @@ Widget build(BuildContext context) {
               ),
             ],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-              onPressed: () {},
-            ),
+          actions: const [
+            NotificationBellButton(color: Colors.black),
           ],
         ),
         floatingActionButton: isContractor

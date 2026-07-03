@@ -5,6 +5,7 @@ import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/core/storage/token_storage.dart';
 import 'package:chambaya/features/auth/presentation/login_page.dart';
 import 'package:chambaya/features/auth/presentation/login_view_model.dart';
+import 'package:chambaya/features/notifications/presentation/notification_bell_button.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,13 +60,7 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
                         const Text('ChambaYa', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1A3FD8))),
-                        Stack(
-                          children: [
-                            IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () {}),
-                            Positioned(right: 10, top: 10,
-                              child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))),
-                          ],
-                        ),
+                        const NotificationBellButton(),
                       ],
                     ),
                   ),

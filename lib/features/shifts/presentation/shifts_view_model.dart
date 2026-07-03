@@ -60,7 +60,9 @@ class ShiftsViewModel extends Cubit<ShiftsState> {
     try {
       final role = await tokenStorage.getRole();
       if (role == 'CONTRATANTE') {
-        final jobs = await repository.getMyJobs();
+        // El backend devuelve los trabajos en orden de creación ascendente;
+        // se invierte para que el más reciente aparezca primero en la lista.
+        final jobs = (await repository.getMyJobs()).reversed.toList();
         emit(ContractorShiftsLoaded(jobs));
       } else {
         final enrollments = await repository.getMyEnrollments();
