@@ -6,6 +6,7 @@ import 'package:chambaya/core/di/dependency_injection.dart';
 import 'package:chambaya/features/navigation/presentation/main_page.dart';
 import 'package:chambaya/features/profile/presentation/skills_selection_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -132,6 +133,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextField(
                   controller:   _phone,
                   keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(9),
+                  ],
                   decoration: InputDecoration(
                     hintText:   '77712345',
                     prefixIcon: const Icon(Icons.phone_outlined),

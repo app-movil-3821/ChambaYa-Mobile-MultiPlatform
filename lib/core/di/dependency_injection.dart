@@ -16,6 +16,10 @@ import 'package:chambaya/features/messages/data/message_repository_impl.dart';
 import 'package:chambaya/features/messages/data/message_service.dart';
 import 'package:chambaya/features/messages/domain/message_repository.dart';
 import 'package:chambaya/features/messages/presentation/messages_view_model.dart';
+import 'package:chambaya/features/notifications/data/notification_repository_impl.dart';
+import 'package:chambaya/features/notifications/data/notification_service.dart';
+import 'package:chambaya/features/notifications/domain/notification_repository.dart';
+import 'package:chambaya/features/notifications/presentation/notifications_view_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:get_it/get_it.dart';
@@ -84,7 +88,10 @@ void setup() {
     () => MessageRepositoryImpl(service: getIt<MessageService>()),
   );
   getIt.registerFactory(
-    () => MessagesViewModel(repository: getIt<MessageRepository>()),
+    () => MessagesViewModel(
+      repository:    getIt<MessageRepository>(),
+      jobRepository: getIt<JobRepository>(),
+    ),
   );
 
   // Shifts
@@ -100,6 +107,17 @@ void setup() {
       repository:   getIt<ShiftRepository>(),
       tokenStorage: getIt<TokenStorage>(),
     ),
+  );
+
+  // Notifications
+  getIt.registerLazySingleton<NotificationService>(
+    () => NotificationService(tokenStorage: getIt<TokenStorage>()),
+  );
+  getIt.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(service: getIt<NotificationService>()),
+  );
+  getIt.registerFactory(
+    () => NotificationsViewModel(repository: getIt<NotificationRepository>()),
   );
 
 }
