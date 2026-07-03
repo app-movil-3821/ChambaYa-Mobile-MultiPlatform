@@ -27,6 +27,10 @@ class RegisterViewModel extends Cubit<RegisterState> {
       emit(RegisterFailure(error: 'La contraseña debe tener al menos 6 caracteres'));
       return;
     }
+    if (phone.length != 9) {
+      emit(RegisterFailure(error: 'El teléfono debe tener 9 dígitos'));
+      return;
+    }
     if (role == 'CHAMBEADOR' && skills.isEmpty) {
       emit(RegisterFailure(error: 'Selecciona al menos una habilidad'));
       return;

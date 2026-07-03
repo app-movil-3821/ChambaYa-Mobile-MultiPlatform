@@ -124,7 +124,7 @@ class _ConversationTile extends StatelessWidget {
           child: const Center(child: Text('💼', style: TextStyle(fontSize: 24))),
         ),
         title: Text(
-          'Trabajo ${conversation.jobId.length > 6 ? conversation.jobId.substring(0, 6) : conversation.jobId}...',
+          conversation.jobTitle ?? 'Trabajo',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
